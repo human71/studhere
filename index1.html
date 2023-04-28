@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Tutorial Website</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Welcome to Tutorial Website</h1>
+    <hr>
+
+    <div id="loginDiv">
+      <h2>Login</h2>
+      <form>
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" class="form-control" id="username" placeholder="Enter username">
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" class="form-control" id="password" placeholder="Enter password">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="login()">Login</button>
+        <button type="button" class="btn btn-link" onclick="showSignup()">Sign up</button>
+      </form>
+    </div>
+
+    <div id="signupDiv" style="display:none;">
+      <h2>Sign up</h2>
+      <form>
+        <div class="form-group">
+          <label for="newUsername">Username:</label>
+          <input type="text" class="form-control" id="newUsername" placeholder="Enter new username">
+        </div>
+        <div class="form-group">
+          <label for="newPassword">Password:</label>
+          <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="signup()">Sign up</button>
+        <button type="button" class="btn btn-link" onclick="showLogin()">Login</button>
+      </form>
+    </div>
+
+    <div id="coursesDiv" style="display:none;">
+      <h2>Enrolled Courses</h2>
+      <div class="card-deck">
+        <div class="card">
+          <img class="card-img-top" src="course1.jpg" alt="Course 1">
+          <div class="card-body">
+            <h5 class="card-title">Course 1</h5>
+            <p class="card-text">Course 1 details</p>
+          </div>
+        </div>
+        <div class="card">
+          <img class="card-img-top" src="course2.jpg" alt="Course 2">
+          <div class="card-body">
+            <h5 class="card-title">Course 2</h5>
+            <p class="card-text">Course 2 details</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Function to show login div and hide signup div
+    function showLogin() {
+      document.getElementById("loginDiv").style.display = "block";
+      document.getElementById("signupDiv").style.display = "none";
+    }
+
+    // Function to show signup div and hide login div
+    function showSignup() {
+      document.getElementById("signupDiv").style.display = "block";
+      document.getElementById("loginDiv").style.display = "none";
+    }
+
+    // Function to perform login authentication
+    function login() {
+      // Fetching input values
+      var username = document.getElementById("username").value;
+      var password = document.getElementById("password").value;
+
+      // Verifying username and password
+      // You can replace this logic with your own authentication logic
+      // Here, we are just checking if the username and password match with the stored values in CSV
+      if (username && password) {
+        // Fetching CSV data
+        fetch('userdata.csv')
+          .then(response => response.text())
+          .then(data => {
+            var lines = data.split('\n');
+            var isValidUser = false;
+            for (var i = 0; i < lines.length; i++) {
+              var values = lines[i].split(',');
+              if (values[0] === username && values[1] === password) {
+                isValidUser = true;
+                break;
+              }
+            }
+            if (isValidUser) {
+              // If login successful, show enrolled courses
+              document.getElementById("coursesDiv").style.display = "block";
+              document.getElementById("loginDiv").style.display = "none";
+            } else {
+              alert("Invalid username or password. Please try again.");
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching CSV:', error);
+          });
+      } else {
+        alert("Please enter username and password.");
+      }
+    }
+
+    // Function to perform signup
+    function signup() {
+      // Fetching input values
+      var newUsername = document.getElementById("newUsername").value;
+      var newPassword = document.getElementById("newPassword").value;
+
+      // Verifying if username and password are entered
+      if (newUsername && newPassword) {
+        // Saving new username and password to CSV
+        var newRow = "\n" + newUsername + "," + newPassword;
+        fetch('userdata.csv', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain'
+          },
+          body: newRow
+        })
+          .then(response => {
+            if (response.ok) {
+              alert("Sign up successful. Please login.");
+              showLogin();
+            } else {
+              alert("Error saving user data. Please try again.");
+            }
+          })
+          .catch(error => {
+            console.error('Error saving user data:', error);
+            alert("Error saving user data. Please try again.");
+          });
+      } else {
+        alert("Please enter new username and password.");
+      }
+    }
+  </script>
+
+</body>
+
+</html>
